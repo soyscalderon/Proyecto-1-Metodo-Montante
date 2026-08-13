@@ -96,7 +96,7 @@ evita la acumulación del error de redondeo. Al finalizar, el último elemento
 de la diagonal proporciona el determinante y la columna de términos
 independientes las soluciones `x_i`.
 
-- **Determinante**: pivote final del proceso de eliminación.
+- **determinante**: pivote final del proceso de eliminación.
 - **Matriz adjunta**: transpuesta de la matriz de cofactores (determinantes de
   menores).
 - **Matriz inversa**: `adjunta / determinante`.
@@ -118,5 +118,5 @@ independientes las soluciones `x_i`.
 | Módulo | Responsabilidad |
 | ------ | --------------- |
 | `main.py` | Inicia la aplicación desde `modules.menu.run`. |
-| `modules/montante.py` | Núcleo matemático: `montante_eliminate`, `determinant`, `solve_system`, `adjugate`, `inverse`, `solvability`, `parse_number`. Usa `fractions` y `decimal` (estándar). |
+| `modules/montante.py` | Núcleo matemático: `montante_eliminate`, `determinante`, `solve_system`, `adjugate`, `inverse`, `solvability`, `parse_number`. Usa `fractions` y `decimal` (estándar). |
 | `modules/menu.py` | Menú interactivo, lectura con validación de entrada, pausa y limpieza de consola según el SO. |

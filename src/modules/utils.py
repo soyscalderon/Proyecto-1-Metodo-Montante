@@ -3,91 +3,87 @@ import sys
 from fractions import Fraction
 from decimal import Decimal, InvalidOperation
 
-def formatear_a_fraccion(value) -> str:
+def formatear_a_fraccion(valor) -> str:
     """Toma una String, un par de numerador y denominador, un Rational, o un flotante
     
     Lo convierte a cadena con formato fraccion a/b"""
-    value = Fraction(value)
-    return str(value)
+    valor = Fraction(valor)
+    return str(valor)
 
-def obtener_numero(text):
-    """Parse an integer or float into an exact Fraction.
+def _obtener_numero(texto):
+    """Retorna Fraction en base a numero ingresado.
 
-    Raises ValueError if the input is not a valid number.
+    ValueError si el el valor no es valido.
     """
-    text = str(text).strip()
-    if not text:
+    texto = str(texto).strip()
+    if not texto:
         raise ValueError("Entrada vacía: se esperaba un número")
     try:
-        return Fraction(int(text))
+        return Fraction(int(texto))
     except ValueError:
         pass
     try:
-        decimal = Decimal(text)
+        decimal = Decimal(texto)
         if not decimal.is_finite():
-            raise ValueError(f'"{text}" no es un número finito válido')
+            raise ValueError(f'"{texto}" no es un número finito válido')
         return Fraction(decimal)
     except InvalidOperation:
-        raise ValueError(f'"{text}" no es un número entero ni flotante válido')
+        raise ValueError(f'"{texto}" no es un número entero ni flotante válido')
 
 def leer_int(prompt:str):
-    """Read a positive integer, retrying until the input is valid."""
+    """Leer entero positivo."""
     while True:
-        raw = input(prompt).strip()
+        entrada = input(prompt).strip()
         try:
-            value = int(raw)
+            value = int(entrada)
             if value <= 0:
                 print("Debe ser un número entero positivo. Intenta de nuevo.")
                 continue
             return value
         except ValueError:
-            print(f'"{raw}" no es un número entero válido. Intenta de nuevo.')
-
+            print(f'"{entrada}" no es un número entero válido. Intenta de nuevo.')
 
 def leer_fraccion(prompt:str):
-    """Read a numeric value (integer or float), retrying until valid."""
+    """Leer int o float, regresar como Fraction usando obtener_numero."""
     while True:
-        raw = input(prompt).strip()
+        entrada = input(prompt).strip()
         try:
-            return obtener_numero(raw)
+            return _obtener_numero(entrada)
         except ValueError as error:
             print(f"Entrada inválida: {error}. Intenta de nuevo.")
 
-
 def leer_fila_matriz(n):
-    """Read one fila of `n` numbers separated by whitespace."""
+    """Leer una fila de n elementos separados por espacio."""
     while True:
-        raw = input(f"  Ingresa los {n} coeficientes separados por espacio: ").strip()
-        parts = raw.split()
-        if len(parts) != n:
+        entrada = input(f"  Ingresa los {n} coeficientes separados por espacio: ").strip()
+        coeficientes = entrada.split()
+        if len(coeficientes) != n:
             print(
                 f"Se esperaban exactamente {n} valores y se recibieron "
-                f"{len(parts)}. Intenta de nuevo."
+                f"{len(coeficientes)}. Intenta de nuevo."
             )
             continue
         try:
-            return [obtener_numero(part) for part in parts]
+            return [_obtener_numero(parte) for parte in coeficientes]
         except ValueError as error:
             print(f"Entrada inválida: {error}. Intenta de nuevo.")
-
 
 def leer_opcion(prompt:str, lower:int, upper:int) -> int:
     """Lee un entero dentro del rango cerrado [lower, upper]."""
     while True:
-        raw = input(prompt).strip()
+        entrada = input(prompt).strip()
         try:
-            value = int(raw)
-            if lower <= value <= upper:
-                return value
+            valor = int(entrada)
+            if lower <= valor <= upper:
+                return valor
             print(f"Opción fuera de rango (se esperaba entre {lower} y {upper}).")
         except ValueError:
-            print(f'"{raw}" no es un número entero válido.')
+            print(f'"{entrada}" no es un número entero válido.')
 
-
-def formatear_a_decimal(value:Fraction | str | Decimal) -> str:
-    """Short decimal representation of a Fraction."""
-    text = f"{float(value):.6f}".rstrip("0").rstrip(".")
-    return text if text not in ("", "-") else "0"
+def formatear_a_decimal(valor:Fraction | str | Decimal) -> str:
+    """Fraccion, string u objeto Decimal a decimal(string)."""
+    texto = f"{float(valor):.6f}".rstrip("0").rstrip(".")
+    return texto if texto not in ("", "-") else "0"
 
 def borrar_consola():
     """

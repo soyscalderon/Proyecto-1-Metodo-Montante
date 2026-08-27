@@ -36,7 +36,6 @@ def opcion_ingresar_matriz(matriz:Matriz):
     print("\nSistema registrado correctamente.\n")
     opcion_mostrar_matriz(matriz)
 
-
 def opcion_editar_elemento_de_matriz(matriz:Matriz):
     if matriz.is_empty():
         print("Primero debes ingresar el sistema (opción 1).\n")
@@ -64,13 +63,12 @@ def opcion_editar_elemento_de_matriz(matriz:Matriz):
         print("Término independiente actualizado.\n")
     opcion_mostrar_matriz(matriz)
 
-
 def opcion_resolver(matriz:Matriz):
     if matriz.is_empty():
         print("Primero debes ingresar el sistema (opción 1).\n")
         return
-    ok, reason = resoluble(matriz.coeficientes, matriz.constantes)
-    print(f"\nVerificación de solvencia: {reason}")
+    ok, razon = resoluble(matriz.coeficientes, matriz.constantes)
+    print(f"\nVerificación de solvencia: {razon}")
     if not ok:
         print("No se aplicará el método de Montante.\n")
         return
@@ -93,7 +91,6 @@ def opcion_resolver(matriz:Matriz):
         )
     print()
 
-
 def opcion_adjunta(matriz:Matriz):
     if matriz.is_empty():
         print("Primero debes ingresar el sistema (opción 1).\n")
@@ -106,7 +103,6 @@ def opcion_adjunta(matriz:Matriz):
     print()
     mostrar_matriz(resultado, "Matriz adjunta")
     print()
-
 
 def opcion_inversa(matriz:Matriz):
     if matriz.is_empty():
@@ -121,7 +117,6 @@ def opcion_inversa(matriz:Matriz):
     mostrar_matriz(resultado, "Matriz inversa")
     print()
 
-
 def opcion_determinante(matriz:Matriz):
     if matriz.is_empty():
         print("Primero debes ingresar el sistema (opción 1).\n")
@@ -131,7 +126,6 @@ def opcion_determinante(matriz:Matriz):
         f"\nDeterminante de la matriz: {formatear_a_fraccion(valor)}"
         f" ≈ {formatear_a_decimal(valor)}\n"
     )
-
 
 def opcion_mostrar_matriz(matriz:Matriz):
     if matriz.is_empty():
@@ -144,13 +138,12 @@ def opcion_mostrar_matriz(matriz:Matriz):
     )
     print()
 
-
 def run():
+    "Metodo principal para ejecutar el menu"
     matriz = Matriz()
     while True:
         borrar_consola()
-        print("=== Método de Montante ===")
-        print("Sistema de ecuaciones lineales: Ax = b\n")
+        print("=== Método de Montante ===\n")
         print("Menú:")
         print("  1) Ingresar / reingresar el sistema de ecuaciones")
         print("  2) Editar matriz o términos independientes")
@@ -160,23 +153,23 @@ def run():
         print("  6) Mostrar el determinante de la matriz")
         print("  7) Mostrar el sistema actual")
         print("  8) Salir")
-        choice = leer_opcion("Selecciona una opción (1-8): ", 1, 8)
+        opcion = leer_opcion("Selecciona una opción (1-8): ", 1, 8)
         try:
-            if choice == 1:
+            if opcion == 1:
                 opcion_ingresar_matriz(matriz)
-            elif choice == 2:
+            elif opcion == 2:
                 opcion_editar_elemento_de_matriz(matriz)
-            elif choice == 3:
+            elif opcion == 3:
                 opcion_resolver(matriz)
-            elif choice == 4:
+            elif opcion == 4:
                 opcion_adjunta(matriz)
-            elif choice == 5:
+            elif opcion == 5:
                 opcion_inversa(matriz)
-            elif choice == 6:
+            elif opcion == 6:
                 opcion_determinante(matriz)
-            elif choice == 7:
+            elif opcion == 7:
                 opcion_mostrar_matriz(matriz)
-            elif choice == 8:
+            elif opcion == 8:
                 print("¡Hasta luego!")
                 break
         except ValueError as error:

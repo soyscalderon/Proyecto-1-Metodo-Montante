@@ -10,7 +10,7 @@ class Matriz:
     def is_empty(self):
         return self.n == 0
 
-def mostrar_matriz(matriz, title:str="Matriz"):
+def mostrar_matriz(matriz:list=[], titulo:str="Matriz"):
     if not matriz:
         print("  (Matriz vacía)")
         return
@@ -19,13 +19,12 @@ def mostrar_matriz(matriz, title:str="Matriz"):
     anchos = [
         max(len(filas[i][j]) for i in range(len(filas))) for j in range(columnas)
     ]
-    print(f"--- {title} ---")
+    print(f"--- {titulo} ---")
     for fila in filas:
         print("  " + "  ".join(cell.rjust(anchos[j]) for j, cell in enumerate(fila)))
 
 def _copiar(matriz):
     return [fila[:] for fila in matriz]
-
 
 def _hallar_pivote(matriz, k:int) -> bool:
     """Busca un pivote valido empezando en fila y columna k.
@@ -42,9 +41,8 @@ def _hallar_pivote(matriz, k:int) -> bool:
             return True
     return False
 
-
 def eliminacion_montante(aumentada):
-    """Aplica el metodo de eliminacion Montante a la matriz aumentado.
+    """Aplica el metodo de eliminacion Montante a la matriz aumentada.
 
     ValueError si algun pivote es 0 (sistema singular).
     """
@@ -64,87 +62,77 @@ def eliminacion_montante(aumentada):
             for j in range(columnas):
                 if j == k:
                     continue
-                matriz[i][j] = (
-                    pivote * matriz[i][j] - matriz[i][k] * matriz[k][j]
-                ) / pivote_anterior
+                matriz[i][j] = (pivote * matriz[i][j] - matriz[i][k] * matriz[k][j]) / pivote_anterior
         pivote_anterior = pivote
     return matriz
-
 
 def determinante(matriz):
     """Calcular el determinantes usando el metodo Montante."""
     n = len(matriz)
     if n == 0:
-        return Fraction(1)
-    work = _copiar(matriz)
-    sign = 1
+        return Fraction(0) #revisar concepto de determinante
+    matriz_temp = _copiar(matriz)
+    signo = 1
     pivote_anterior = Fraction(1)
     for k in range(n - 1):
-        if work[k][k] == 0:
-            swapped = _hallar_pivote(work, k)
-            if not swapped:
+        if matriz_temp[k][k] == 0:
+            matriz_temp_cambiada = _hallar_pivote(matriz_temp, k)
+            if not matriz_temp_cambiada:
                 return Fraction(0)
-            sign = -sign
-        pivote = work[k][k]
+            signo = -signo
+        pivote = matriz_temp[k][k]
         for i in range(k + 1, n):
             for j in range(k + 1, n):
-                work[i][j] = (
-                    pivote * work[i][j] - work[i][k] * work[k][j]
-                ) / pivote_anterior
+                matriz_temp[i][j] = (pivote * matriz_temp[i][j] - matriz_temp[i][k] * matriz_temp[k][j]) / pivote_anterior
         pivote_anterior = pivote
-    return sign * work[n - 1][n - 1]
-
+    return signo * matriz_temp[n - 1][n - 1]
 
 def resolver_sistema(coeficientes, constantes):
-    """Solve the linear system using the Montante method.
+    """Resolver el sistema de ecuaciones con Montante.
 
-    Returns a list of Fractions with the value of each unknown.
-    Raises ValueError if the system has no unique solution.
+    Retorna una lista de valores para cada incognita.
+    ValueError si no tiene solucion unica.
     """
     n = len(coeficientes)
     aumentada = [fila + [b] for fila, b in zip(coeficientes, constantes)]
-    reduced = eliminacion_montante(aumentada)
-    last_pivote = reduced[n - 1][n - 1]
-    if last_pivote == 0:
-        raise ValueError(
-            "El sistema no tiene solución única (determinante igual a cero)"
-        )
-    return [reduced[i][n] / last_pivote for i in range(n)]
-
+    reducida = eliminacion_montante(aumentada)
+    ultimo_pivote = reducida[n - 1][n - 1]
+    if ultimo_pivote == 0:
+        raise ValueError("El sistema no tiene solución única (determinante igual a cero)")
+    return [reducida[i][n] / ultimo_pivote for i in range(n)]
 
 def rango(matriz):
-    """Row echelon rank of a matriz using exact arithmetic."""
-    work = _copiar(matriz)
-    n = len(work)
-    columnas = len(work[0]) if n else 0
-    current_fila = 0
+    """Auxiliar para saber que tipo es una matriz con determinante 0."""
+    matriz_temp = _copiar(matriz)
+    n = len(matriz_temp)
+    columnas = len(matriz_temp[0]) if n else 0
+    fila_actual = 0
     for col in range(columnas):
         pivote_fila = None
-        for i in range(current_fila, n):
-            if work[i][col] != 0:
+        for i in range(fila_actual, n):
+            if matriz_temp[i][col] != 0:
                 pivote_fila = i
                 break
         if pivote_fila is None:
             continue
-        work[current_fila], work[pivote_fila] = work[pivote_fila], work[current_fila]
-        pivote = work[current_fila][col]
+        matriz_temp[fila_actual], matriz_temp[pivote_fila] = matriz_temp[pivote_fila], matriz_temp[fila_actual]
+        pivote = matriz_temp[fila_actual][col]
         for j in range(col, columnas):
-            work[current_fila][j] /= pivote
+            matriz_temp[fila_actual][j] /= pivote
         for i in range(n):
-            if i != current_fila and work[i][col] != 0:
-                factor = work[i][col]
+            if i != fila_actual and matriz_temp[i][col] != 0:
+                factor = matriz_temp[i][col]
                 for j in range(col, columnas):
-                    work[i][j] -= factor * work[current_fila][j]
-        current_fila += 1
-        if current_fila == n:
+                    matriz_temp[i][j] -= factor * matriz_temp[fila_actual][j]
+        fila_actual += 1
+        if fila_actual == n:
             break
-    return current_fila
-
+    return fila_actual
 
 def resoluble(coeficientes, constantes):
     """Verificar si el sistema es resoluble.
 
-    Retorna una tupla (es_resoluble, descripcion). Usa el teorema de Rouche-Frobenius (rango de los coeficientes vs rango de la matriz aumentada).
+    Retorna una tupla (es_resoluble, descripcion).
     """
     aumentada = [fila + [b] for fila, b in zip(coeficientes, constantes)]
     if determinante(coeficientes) != 0:
@@ -152,9 +140,9 @@ def resoluble(coeficientes, constantes):
             "Sistema compatible determinado: solución única "
             "(determinante distinto de cero)."
         )
-    rank_a = rango(coeficientes)
-    rank_ab = rango(aumentada)
-    if rank_a == rank_ab:
+    rango_a = rango(coeficientes)
+    rango_ab = rango(aumentada)
+    if rango_a == rango_ab:
         return True, (
             "Sistema compatible indeterminado: tiene infinitas soluciones "
             "(determinante cero, rangos iguales)."
@@ -164,13 +152,11 @@ def resoluble(coeficientes, constantes):
         "(determinante cero y rangos distintos)."
     )
 
-
 def _menor(matriz, fila, col):
     return [
         valores_fila[:col] + valores_fila[col + 1 :]
         for valores_fila in (matriz[:fila] + matriz[fila + 1 :])
     ]
-
 
 def adjunta(matriz):
     """Obtiene la adjunta de la matriz (traspuesta de la matriz de cofactores)."""
@@ -185,7 +171,6 @@ def adjunta(matriz):
                 cofactor = -cofactor
             adj[j][i] = cofactor
     return adj
-
 
 def inversa(matriz):
     """Obtiene la matriz inversa usando adjunta/determinante.
